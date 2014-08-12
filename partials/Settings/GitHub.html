@@ -12,8 +12,9 @@
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
                     ng-click="GetGitHubRepo()">Репозитории <span class="caret"></span></button>
             <ul class="dropdown-menu" role="menu">
-                <li ng-repeat="repo in repos" ng-click="ShowIssueList(repo.issues_url)">{{"repo.name"}}</li>
-
+                <li ng-repeat="repo in repos" ng-click="ShowIssueList(repo.issues_url)">{{repo.name}}
+                	
+                </li>
             </ul>
         </div>
     </div>

@@ -159,7 +159,9 @@ angular.module('FactoryModule',[])
             },
             Create:function(data){return $http.post(tag+'/Create',data);},
             DeleteTagFromTask:function(data){return $http.post(tag+'/DeleteTagFromTask',data);},
-            DeleteTag:function(data){return $http.post(tag+'/DeleteTag',data);}
+            DeleteTag:function(data){return $http.post(tag+'/DeleteTag',data);},
+            GetUserStatistic:function(UserId){return $http.get(tag+'/GetUserStatistic/'+UserId)},
+            GetStatistic:function(){return $http.get(tag+'/GetStatistic/')}
         }
     }])
     .factory('TemplateFactory',['$http',function($http){
@@ -194,6 +196,45 @@ angular.module('FactoryModule',[])
         CreateIssue:function(data) {return $http.post(github+'/CreateIssue',data); },
         GetGitHubRepo:function(){return $http.get(github+"/GetGitHubRepo");}
     }
+	}])
+	.factory('FactotyUpload',['$http',function($http){
+	var upload="/scrum/Upload";
+	return{
+		FileUpload:function(InputName, OutputName){
+	        var formData = new FormData();
+	        for(var i=0;i<document.getElementById(InputName).files.length;i++){
+	            formData.append("file"+i, document.getElementById(InputName).files[i]);
+	        }
+	        var reader = new FileReader;
+	        reader.readAsDataURL(document.getElementById(InputName).files[0]);
+	        //var place = document.getElementById("rrr");
+	        // Как только картинка загрузится
+	        reader.onload = function(e) {
+	          //  place.src = e.target.result;
+	            console.log('nenene');
+	        }
+	        var xhr = new XMLHttpRequest();
+
+	        // Отправим данные на сервер
+	        xhr.open("POST", upload+"/FileUpload/", true);
+	        xhr.upload.onprogress = function(e) { // <<<
+	            if (e.lengthComputable) {
+	                progressBar.value = (e.loaded / e.total) * 100;
+	            }
+	        };
+
+	        xhr.onreadystatechange=function(e){
+	            if (xhr.readyState == 4) {
+	                var val = document.getElementById(OutputName);
+	                val.value=xhr.responseText;
+	            }
+	        };
+	        xhr.send(formData);
+    	},
+    	GetListFileUpload:function(){
+	    	return $http.get(upload+"/GetListFileUpload/")
+	    }
+	}
 }]);
 
 

@@ -38,6 +38,20 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="row" ng-repeat="stat in StatisticUser">
+            	<div class="col-lg-3">
+            		{{stat.Data}}
+            	</div>
+            	<div class="col-lg-9">
+            		<div>{{stat.count}}
+            		максимальное количество
+					{{stat.Maxlen}}
+            		</div>
+            	</div>
+            </div>
+            
+            
         </div>
     </div>
 </div>

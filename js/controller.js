@@ -72,6 +72,15 @@ function CreateTaskCtrl($rootScope,$scope,$routeParams,TaskFactory,GroupFactory,
         data.Annotation=$scope.Annotation;
         data.Targets=$scope.Targets;
         data.Sources=$scope.Sources;
+        //data.SourceTexts=window.btoa($scope.SourceTexts);
+        //for(var l=DeleteItems.length-1;l>=0;l=l-1){data.splice(DeleteItems[l],1);}
+        /*
+         var bodies =$scope.SourceTexts
+        for (var i = 0; i < bodies.length; i++) {
+          bodies[i].Body = window.btoa(bodies[i].Body);
+        }
+        $scope.SourceTexts = bodies
+        */
         data.SourceTexts=$scope.SourceTexts;
         TaskFactory.Create(data).success(function(){
             MasterTask ? location.href="#/Tasks/"+MasterTask :location.href="#/Tasks"
@@ -303,8 +312,9 @@ function ViewTaskCtrl($rootScope,$scope,$routeParams,TaskFactory,CommentService)
     };
 
     $scope.aceLoaded=function(ace){
+	    //alert("ace loaded");
         var code = ace.getSession().getValue();
-        ace.getSession().setValue(window.atob(code));
+        //ace.getSession().setValue(window.atob(code));
     };
     $scope.CreateCommentForTask=function(item){
         CommentService.CreateCommentForTask(item,function(data){
@@ -431,7 +441,7 @@ function RegistrationCtrl($rootScope,$scope,$routeParams,SystemUserFactory,md5){
     $scope.Submit=function(data){
         data.uid=$routeParams.uid;
         SystemUserFactory.Registration(data).success(function(data){
-            location.reload();
+            location.href ="http://akvant.pro/scrumbler/index.html";
         });
     };
     $scope.PhoneNumberFilter=function(text){
@@ -485,7 +495,7 @@ function SystemUsersCtrl($rootScope,$scope,$routeParams,SystemUserFactory){
         location.href="#/User/"+ID;
     };
 }
-function ViewUserCtrl($rootScope,$scope,$routeParams,SystemUserFactory){
+function ViewUserCtrl($rootScope,$scope,$routeParams,SystemUserFactory,TagsFactory){
     $rootScope.Menu={ViewUsers:1};
     $scope.GetUsers=function(){
         SystemUserFactory.GetUserByID($routeParams.ID).success(function(data){
@@ -493,6 +503,22 @@ function ViewUserCtrl($rootScope,$scope,$routeParams,SystemUserFactory){
         });
     };
     $scope.GetUsers();
+    $scope.GetUserStatTag=function()
+    {
+	    TagsFactory.GetUserStatistic($routeParams.ID).success(function(data){
+		    $scope.StatisticUser=data.children;
+		});
+		TagsFactory.GetStatistic().success(function(data){
+	    	  $scope.Statistic=data.children[0];
+	    	  for(i=0;i<$scope.StatisticUser.length;i++){
+		    	  
+	    	  	arr=$scope.Statistic[$scope.StatisticUser[i].Data];
+	    	  	$scope.StatisticUser[i].Maxlen=arr[0].count
+	    	  }
+	    	  console.log($scope.StatisticUser);
+		});
+    }
+    $scope.GetUserStatTag();
 }
 
 function ViewGroupsCtrl($rootScope,$scope,$routeParams,$alert,GroupFactory,GroupService){
@@ -577,7 +603,7 @@ function CreateGroupCtrl($rootScope,$scope,$routeParams,GroupFactory){
     $rootScope.Menu={ViewGroups:1};
     $scope.Submit=function(data){
         GroupFactory.Create(data).success(function(data){
-
+		location.href="#/Groups"
         });
     };
 }
@@ -798,6 +824,7 @@ function ViewRoomCtrl($rootScope,$scope,$routeParams,$alert,$modal,RoomFactory,C
     $scope.aceLoaded=function(ace){
         var code = ace.getSession().getValue();
         ace.getSession().setValue(window.atob(code));
+        //ace.getSession().setValue(code);
     };
     $scope.StartTask=function(ID){
         RoomFactory.StartTask(ID).success(function(data){
@@ -889,7 +916,7 @@ function ViewRoomCtrl($rootScope,$scope,$routeParams,$alert,$modal,RoomFactory,C
     ]
 }
 
-function ViewTopMenuCtrl($rootScope,$scope,$routeParams,$alert,$modal,$cookies,AuthFactory,SearchFactory){
+function ViewTopMenuCtrl($rootScope,$scope,$routeParams,$alert,$modal,$cookies,AuthFactory,SearchFactory,FactotyUpload){
     var modal;
     $scope.ModalLogin=function(){
         modal=$modal({scope: $scope, backdrop:false, template: 'partials/modal/Login.html', show: true});
@@ -897,7 +924,7 @@ function ViewTopMenuCtrl($rootScope,$scope,$routeParams,$alert,$modal,$cookies,A
     $scope.Login=function(data){
         AuthFactory.Login(data).success(function(data){
             $scope.success=data;
-            if($scope.success.Status.Success){modal.hide();$scope.error="";$scope.Start();location.reload();}
+            if($scope.success.Status.Success){modal.hide();$scope.error="";$scope.Start();location.reload()}
             else{$scope.error=$rootScope.Page.ErrorStatus["3"]}
         });
     };
@@ -920,7 +947,7 @@ function ViewTopMenuCtrl($rootScope,$scope,$routeParams,$alert,$modal,$cookies,A
     $scope.Start();
     $scope.SubmitSearch=function(text){
         if(text!=""){
-            location.href="#/Search"
+            location.href="#/Search";
         }
     };
     $scope.Search=function(text){
@@ -935,6 +962,15 @@ function ViewTopMenuCtrl($rootScope,$scope,$routeParams,$alert,$modal,$cookies,A
         }
         if(text==""){$rootScope.SearchData=[];}
     };
+    $scope.uploadFile=function(){
+	    //console.log("uploadmethod");
+	    FactotyUpload.FileUpload("InputName","OutputName");
+	}
+    $scope.GetListFileUpload=function(){
+	    FactotyUpload.GetListFileUpload().success(function(data){
+		    $scope.FileList=data.children;
+	    });
+    }
 }
 
 
@@ -1070,7 +1106,12 @@ function ViewSettingsCtrl($rootScope,$scope,$routeParams,$alert,$modal,TagsFacto
 
         })
     }
-
+	$scope.GetGitHubRepo=function(){
+		GitHubFactory.GetGitHubRepo().success(function(data){
+			$scope.repos=data;
+			console.log($scope.repos);
+		})
+	}
     $scope.ChangeGitHubLogin=function(data){
         SystemUserFactory.UpdateGitHubLogin(data).success(function(data){});
     };
@@ -1122,8 +1163,107 @@ function ViewTemplateCtrl($rootScope,$scope,$routeParams,$alert,$modal,TemplateF
 
         });
     };
+    
 }
 
+// Контроллер отвечающий за Чат
+function ChatCtrl($scope, $http, $routeParams, $cookies){
+    $scope.ChatHide = true;
+    document.getElementById("radio1").checked="true";
+    // Получаем сообщения чата
+    function getCookie(name){
+        var matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
+    }
+    $scope.ChatMenu=function(){
+    if(getCookie('login')!=""){
+     return false;
+    }
+    else{
+       return true;
+    }  }
+
+    //TODO: сделать сравнение полученного с текущим и если оно != то выдать уведомление
+    $scope.InitMessage=function(){
+        $http.get("http://akvant.pro/scrum/Chat/GetMessage/").success(function(data){$scope.messages=data.children;}).error(function(data,status){});
+    }
+
+    $scope.GetMessage=function(){
+	    if(document.getElementById("radio1").checked){
+			
+	        $http.get("http://akvant.pro/scrum/Chat/GetMessage/").success(function(data){
+	            $scope.tmpMessages=data.children;
+	            var message_1 =$scope.messages;
+	            var message_2 =$scope.tmpMessages;
+	            var LastId = message_1[0]["ID"];
+	            var CurrId = message_2[0]["ID"];
+	            //$scope.tmpMessage = $scope.message;
+	            if (LastId != CurrId) {
+	                $scope.messages = $scope.tmpMessages;
+	                $scope.SendNotification($scope.messages[0].FirstName, $scope.messages[0].Message,"",$scope.messages[0].Gravatar);
+	            }
+	        }).error(function(data,status){});
+	    }
+        
+    }
+
+    // Отправляем
+    $scope.SendMessage = function (m){
+        m.IdScrumberUser=$cookies.id
+        $http.put("http://akvant.pro/scrum/Chat/SendMessage/",m)
+            .success(function(data){
+            }).error(function(data,status){});
+        // очищаем форму
+        $scope.m="";
+    }
+    $scope.InitMessage();
+// запускаем чат и храним его в intervalID
+    $scope.intervalID = setInterval(function () { $scope.GetMessage();}, 3000);
+    //$scope.message=$scope.tmpMessage;
+
+    $scope.showForm = function(sh){
+
+
+        if(sh){
+            $scope.show = true;
+            $scope.hide = false;
+//возобновляем чат
+            $scope.intervalID = setInterval(function () { $scope.GetMessage();}, 1000);
+        } else {
+            $scope.show = false;
+            $scope.hide = true;
+// приостанавливаем чат
+            clearInterval($scope.intervalID);
+        }
+    }
+
+    $scope.show = true;
+    $scope.hide = false;
+
+
+
+
+    $scope.SendNotification = function (theme, body, tag, icon){
+        var currentPermission;
+        Notification.requestPermission( function(result) { currentPermission = result  } );
+
+        var params = {
+            body :  body,
+            tag :  tag,
+            icon :  icon
+        };
+
+
+        var notify = new Notification(theme,params);
+
+        notify.onerror = function(){
+            console.log("permission state = default or denied");
+        };
+
+
+    }
+}
 
 
 

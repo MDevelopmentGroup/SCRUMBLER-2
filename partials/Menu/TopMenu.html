@@ -15,17 +15,21 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <li class="active"><a href="#">Link</a></li>
-                <li><a href="#">Link</a></li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+                <li style="height: 50px;width: 100px;padding-top: 12px;background-color: #e7e7e7;margin-left: 2px;margin-right:2px"><label style="font-size: 13px;" class="file_upload">
+                	<span class="button">Upload</span>
+        				<mark>File not selected</mark>
+        				<input type="file" multiple id="InputName" onchange="angular.element(this).scope().uploadFile()" ng-model="Uploadfile">
+    				</label></li>
+                <li class="dropdown" ng-click="GetListFileUpload()">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Shared <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        <li><a href="#">Action</a></li>
-                        <li><a href="#">Another action</a></li>
-                        <li><a href="#">Something else here</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#">Separated link</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#">One more separated link</a></li>
+                    	<li class="divider"></li>
+                    	<li ng-repeat="File in FileList">
+                    		<a target="blank" href="img/upload/{{File.FileName}}">
+                    			{{File.DefaultName}}
+                    		</a>
+                    	</li>
+                    	<li class="divider"></li>
                     </ul>
                 </li>
             </ul>
