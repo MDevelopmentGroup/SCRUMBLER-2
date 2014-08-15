@@ -1,0 +1,39 @@
+<div ng-init="Properties = [{'Prop':''}]; Classes = [{'ClassName':'','Properties':[{'Name':''}]}];"/>
+
+<div class="form-group">
+    <label for="URL" class="col-sm-2 control-label hidden-sm hidden-xs">Классы:</label>
+    <div class="col-lg-9">
+        <div ng-repeat="Class in Classes">
+            <div class="col-lg-6">
+                <input type="text" class="form-control " ng-model="Classes[$index].ClassName" placeholder="Class name"/>
+            </div>
+            <div class="col-lg-1">
+                <a class="btn btn-default" href ng-click="Classes.splice($index, 1)"><span class="glyphicon glyphicon-remove"></span>{{$index}}</a>
+            </div>
+<!-- свойства классов начало-->
+            <div class="form-group">
+                <label for="URL" class="col-sm-2 control-label hidden-sm hidden-xs">Свойства класса {{Class.ClassName}}:</label>
+                <div class="col-lg-9">
+                    <div ng-repeat="Prop in Class.Properties">
+                        <div class="col-lg-5">
+                            <input type="text" class="form-control " ng-model="Prop.Name" placeholder="Property name"/>
+                        </div>
+                        <div class="col-lg-1">
+                            <a class="btn btn-default" href ng-click="Class.Properties.splice($index, 1)"><span class="glyphicon glyphicon-remove"></span> {{$index}}</a>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-12">
+                        <hr style="margin-top: 5px; margin-bottom: 5px">
+                        <a href ng-click="Class.Properties.push({});Console.Log(Class.Properties)"><span class="glyphicon glyphicon-plus"></span></a>
+                    </div>
+                </div>
+            </div>
+<!-- свойства классов конец-->
+        </div>
+        <div class="col-lg-12">
+            <hr style="margin-top: 5px; margin-bottom: 5px">
+            <a href ng-click="Classes.push({'ClassName':'','Properties':[{'Name':''}]});Console.Log(Classes)"><span class="glyphicon glyphicon-plus"></span></a>
+        </div>
+    </div>
+</div>
